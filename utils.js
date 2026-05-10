@@ -2,6 +2,8 @@
 // 工具函式
 // ========================================
 
+// Jimmy 寫完了
+
 const dayjs = require('dayjs');
 
 /**
@@ -11,6 +13,9 @@ const dayjs = require('dayjs');
  */
 function getDiscountRate(product) {
   // 請實作此函式
+  const rate = Math.round(product.price / product.origin_price * 10)
+
+  return `${rate}折`
 }
 
 /**
@@ -20,6 +25,7 @@ function getDiscountRate(product) {
  */
 function getAllCategories(products) {
   // 請實作此函式
+  return [...new Set(products.map(product => product.category))]
 }
 
 /**
@@ -30,6 +36,7 @@ function getAllCategories(products) {
 function formatDate(timestamp) {
   // 請實作此函式
   // 提示：dayjs.unix...
+  return dayjs.unix(timestamp).format('YYYY/MM/DD HH:mm')
 }
 
 /**
@@ -43,6 +50,12 @@ function getDaysAgo(timestamp) {
   // 1. 用 dayjs() 取得今天
   // 2. 用 dayjs.unix(timestamp) 取得日期
   // 3. 用 .diff() 計算天數差異
+  const dayDiff = dayjs().diff(dayjs.unix(timestamp),'day')
+  if(dayDiff ===0 || dayDiff <=0){
+    return '今天'
+  }else{
+    return `${dayDiff} 天前`
+  }
 }
 
 /**
@@ -59,6 +72,40 @@ function getDaysAgo(timestamp) {
  */
 function validateOrderUser(data) {
   // 請實作此函式
+  const isNameValid = data.name.trim();
+
+  const telRegex = /^09\d{8}$/;
+  const isTelValid = telRegex.test(data.tel);
+
+  const isEmailValid = data.email.includes('@');
+
+  const isAddress = data.address.trim();
+
+  const paymentRegex = ['ATM', 'Credit Card', 'Apple Pay'];
+  const isPaymentValid = paymentRegex.includes(data.payment);
+
+  if (isNameValid && isTelValid && isEmailValid && isAddress && isPaymentValid){
+    return {isValid:true ,errors:[] }
+  }else{
+    const errors = []
+    if(!isNameValid){
+      errors.push('姓名不可為空')
+    }
+    if(!isTelValid){
+      errors.push('電話格必須是 09 開頭的 10 位數字')
+    }
+    if(!isEmailValid){
+      errors.push('Email 必須包含 @ 符號')
+    }
+    if(!isAddress){
+      errors.push('地址不可為空')
+    }
+    if(!isPaymentValid){
+      errors.push('付款方式必須是ATM, Credit Card, Apple Pay 其中之一')
+    }
+    return { isValid:false, errors:errors }
+
+  }
 }
 
 /**
@@ -73,6 +120,16 @@ function validateOrderUser(data) {
  */
 function validateCartQuantity(quantity) {
   // 請實作此函式
+  if(!Number.isInteger(quantity)){
+    return {isValid: false, error: '數量必須是正整數'}
+  }
+  if (quantity < 1){
+    return {isValid: false, error: '數量不可小於 1'}
+  }
+  if (quantity > 99){
+    return {isValid: false, error: '數量不可大於 99'}
+  }
+  return {isValid: true, error: ''}
 }
 
 /**
@@ -92,6 +149,7 @@ function validateCartQuantity(quantity) {
  */
 function formatCurrency(amount) {
   // 請實作此函式
+  return `NT$ ${amount.toLocaleString('zh-TW')}`
 }
 
 module.exports = {
